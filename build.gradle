@@ -1,0 +1,76 @@
+apply plugin: 'groovy'
+apply plugin: 'spring-boot'
+apply plugin: 'maven-publish'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'http://repo.spring.io/milestone' }
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
+        classpath 'org.ajoberstar:gradle-git:1.4.2'
+    }
+}
+
+sourceSets.main.java.srcDirs = []
+sourceSets.main.groovy.srcDirs += ['src/main/java']
+
+sourceCompatibility = '1.8'
+
+configurations {
+    all {
+        resolutionStrategy {
+            eachDependency { DependencyResolveDetails details ->
+                // To prevent an accidental usage of groovy-all.jar and groovy.jar in different versions
+                // all modularized Groovy jars are replaced with groovy-all.jar by default.
+                if (details.requested.group == 'org.codehaus.groovy' && details.requested.name != 'groovy-all') {
+                    details.useTarget("org.codehaus.groovy:groovy-all:${details.requested.version}")
+                }
+                if (details.requested.group == 'org.springframework.boot') { details.useVersion springBootVersion }
+                if (details.requested.group == 'org.springframework') { details.useVersion '4.3.0.RELEASE' }
+                if (details.requested.group == 'org.aspectj') { details.useVersion '1.8.8' }
+                if (details.requested.group == 'org.springframework.cloud' &&
+                        ['sleuth', 'zipkin', 'zookeeper'].every { !details.requested.name.contains(it) } ) { details.useVersion '1.1.0.M3' }
+            }
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework:spring-context-support'
+    compile 'org.codehaus.groovy:groovy-all'
+    compile 'com.google.guava:guava:18.0'
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.apache.tomcat.embed:tomcat-embed-el'
+    compile 'org.yaml:snakeyaml'
+    compile 'org.aspectj:aspectjrt'
+    compile 'net.sf.ehcache:ehcache:2.10.1'
+    compile "org.projectlombok:lombok:$lombokVersion"
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.4'
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.4"
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.4'
+    compile "org.liquibase:liquibase-core:$liquibaseVersion"
+
+    runtime 'cglib:cglib-nodep:3.2.1'
+    runtime 'org.objenesis:objenesis:2.2'
+    runtime 'com.h2database:h2'
+
+    testCompile 'com.jayway.jsonpath:json-path-assert:2.2.0'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.spockframework:spock-spring'
+    testCompile 'com.jayway.awaitility:awaitility-groovy:1.7.0'
+}
+
+wrapper {
+    gradleVersion '2.12'
+}

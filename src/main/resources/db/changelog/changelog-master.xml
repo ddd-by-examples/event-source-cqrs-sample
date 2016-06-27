@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="1" author="pilo">
+        <createSequence schemaName="public" sequenceName="event_stream_seq"/>
+        <createTable tableName="event_streams">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="event_stream_pkey"/>
+            </column>
+            <column name="version" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="aggregate_uuid" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint columnNames="aggregate_uuid"
+                             constraintName="aggregate_uuid_unique"
+                             deferrable="false" disabled="false" initiallyDeferred="false"
+                             tableName="event_streams"/>
+        <createIndex indexName="idx_aggregate_uuid_event_stream"
+                     tableName="event_streams">
+            <column name="aggregate_uuid" />
+        </createIndex>
+
+        <createSequence schemaName="public" sequenceName="event_descriptors_seq"/>
+        <createTable tableName="event_descriptors">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="event_descriptors_pkey"/>
+            </column>
+            <column name="occurred_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="varchar(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_stream_id" type="int8">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="event_stream_id"
+                                 baseTableName="event_descriptors" baseTableSchemaName="public"
+                                 constraintName="fk_event_desc_event_stream" deferrable="false"
+                                 initiallyDeferred="false" onDelete="CASCADE" onUpdate="CASCADE"
+                                 referencedColumnNames="id" referencedTableName="event_streams"
+                                 referencedTableSchemaName="public" />
+    </changeSet>
+
+    <changeSet id="2" author="pilo">
+        <createSequence schemaName="public" sequenceName="items_seq"/>
+        <createTable tableName="items">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="items_pkey"/>
+            </column>
+            <column name="uuid" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(30)"/>
+            <column name="when_bought" type="TIMESTAMP"/>
+            <column name="when_paid" type="TIMESTAMP"/>
+            <column name="when_payment_timeout" type="TIMESTAMP"/>
+            <column name="when_payment_marked_as_missing" type="TIMESTAMP"/>
+        </createTable>
+        <createIndex indexName="idx_item_when_expires"
+                     tableName="items">
+            <column name="when_payment_timeout" />
+        </createIndex>
+    </changeSet>
+
+
+</databaseChangeLog>
