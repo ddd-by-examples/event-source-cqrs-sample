@@ -10,13 +10,15 @@ buildscript {
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
-        classpath 'org.ajoberstar:gradle-git:1.4.2'
     }
 
 }
 
+
 apply plugin: 'java'
+apply plugin: 'groovy'
 apply plugin: 'spring-boot'
+
 
 jar {
     baseName = 'event-source-sample'
@@ -31,16 +33,10 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-
-
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-    compile 'org.springframework:spring-context-support'
-    compile 'org.codehaus.groovy:groovy-all'
     compile 'com.google.guava:guava:18.0'
-    compile 'org.apache.tomcat.embed:tomcat-embed-el'
-    compile 'org.yaml:snakeyaml'
     compile "org.projectlombok:lombok:$lombokVersion"
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.4'
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.4"
