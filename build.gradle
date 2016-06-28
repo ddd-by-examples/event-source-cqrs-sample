@@ -31,8 +31,6 @@ configurations {
                 if (details.requested.group == 'org.springframework.boot') { details.useVersion springBootVersion }
                 if (details.requested.group == 'org.springframework') { details.useVersion '4.3.0.RELEASE' }
                 if (details.requested.group == 'org.aspectj') { details.useVersion '1.8.8' }
-                if (details.requested.group == 'org.springframework.cloud' &&
-                        ['sleuth', 'zipkin', 'zookeeper'].every { !details.requested.name.contains(it) } ) { details.useVersion '1.1.0.M3' }
             }
         }
     }
@@ -65,10 +63,8 @@ dependencies {
     runtime 'org.objenesis:objenesis:2.2'
     runtime 'com.h2database:h2'
 
-    testCompile 'com.jayway.jsonpath:json-path-assert:2.2.0'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.spockframework:spock-spring'
-    testCompile 'com.jayway.awaitility:awaitility-groovy:1.7.0'
 }
 
 wrapper {
