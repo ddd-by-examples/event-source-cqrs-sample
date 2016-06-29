@@ -1,6 +1,6 @@
 package io.pillopl.eventsource.integration.readmodel
 
-import io.pillopl.eventsource.domain.shopitem.ShopItems
+import io.pillopl.eventsource.boundary.ShopItems
 import io.pillopl.eventsource.integration.IntegrationSpec
 import io.pillopl.eventsource.readmodel.JdbcReadModel
 import io.pillopl.eventsource.readmodel.PaymentTimeoutChecker

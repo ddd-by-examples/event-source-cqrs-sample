@@ -6,11 +6,7 @@ import io.pillopl.eventsource.domain.shopitem.events.ItemPaymentTimeout
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static io.pillopl.eventsource.ShopItemFixture.bought
-import static io.pillopl.eventsource.ShopItemFixture.initialized
-import static io.pillopl.eventsource.ShopItemFixture.paid
-import static io.pillopl.eventsource.ShopItemFixture.withTimeout
-import static io.pillopl.eventsource.ShopItemFixture.withTimeoutAndPaid
+import static io.pillopl.eventsource.ShopItemFixture.*
 import static java.time.Instant.now
 import static java.time.Instant.parse
 

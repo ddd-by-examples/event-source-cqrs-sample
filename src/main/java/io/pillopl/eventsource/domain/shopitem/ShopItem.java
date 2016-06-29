@@ -1,7 +1,7 @@
 package io.pillopl.eventsource.domain.shopitem;
 
 import com.google.common.collect.ImmutableList;
-import io.pillopl.eventsource.domain.DomainEvent;
+import io.pillopl.eventsource.domain.shopitem.events.DomainEvent;
 import io.pillopl.eventsource.domain.shopitem.events.ItemBought;
 import io.pillopl.eventsource.domain.shopitem.events.ItemPaid;
 import io.pillopl.eventsource.domain.shopitem.events.ItemPaymentTimeout;
@@ -13,10 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
-import static io.pillopl.eventsource.domain.shopitem.ShopItemState.INITIALIZED;
-import static io.pillopl.eventsource.domain.shopitem.ShopItemState.PAID;
-import static io.pillopl.eventsource.domain.shopitem.ShopItemState.PAYMENT_MISSING;
-import static io.pillopl.eventsource.domain.shopitem.ShopItemState.BOUGHT;
+import static io.pillopl.eventsource.domain.shopitem.ShopItemState.*;
 
 @Value
 public class ShopItem {

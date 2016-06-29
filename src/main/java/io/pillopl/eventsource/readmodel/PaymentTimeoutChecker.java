@@ -1,7 +1,7 @@
 package io.pillopl.eventsource.readmodel;
 
+import io.pillopl.eventsource.boundary.ShopItems;
 import io.pillopl.eventsource.domain.shopitem.commands.MarkPaymentTimeout;
-import io.pillopl.eventsource.domain.shopitem.ShopItems;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

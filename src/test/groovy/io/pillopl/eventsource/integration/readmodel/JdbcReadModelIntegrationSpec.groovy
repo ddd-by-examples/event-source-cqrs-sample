@@ -1,6 +1,6 @@
 package io.pillopl.eventsource.integration.readmodel
 
-import io.pillopl.eventsource.domain.shopitem.ShopItems
+import io.pillopl.eventsource.boundary.ShopItems
 import io.pillopl.eventsource.integration.IntegrationSpec
 import io.pillopl.eventsource.readmodel.JdbcReadModel
 import io.pillopl.eventsource.readmodel.ShopItemDto
@@ -9,9 +9,7 @@ import spock.lang.Subject
 
 import java.time.Instant
 
-import static io.pillopl.eventsource.CommandFixture.buyItemCommand
-import static io.pillopl.eventsource.CommandFixture.markPaymentTimeoutCommand
-import static io.pillopl.eventsource.CommandFixture.payItemCommand
+import static io.pillopl.eventsource.CommandFixture.*
 import static java.time.Instant.parse
 
 class JdbcReadModelIntegrationSpec extends IntegrationSpec {

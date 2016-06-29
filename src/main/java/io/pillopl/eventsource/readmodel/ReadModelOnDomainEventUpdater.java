@@ -1,10 +1,9 @@
 package io.pillopl.eventsource.readmodel;
 
-import io.pillopl.eventsource.domain.DomainEvent;
+import io.pillopl.eventsource.domain.shopitem.events.DomainEvent;
 import io.pillopl.eventsource.domain.shopitem.events.ItemBought;
 import io.pillopl.eventsource.domain.shopitem.events.ItemPaid;
 import io.pillopl.eventsource.domain.shopitem.events.ItemPaymentTimeout;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;

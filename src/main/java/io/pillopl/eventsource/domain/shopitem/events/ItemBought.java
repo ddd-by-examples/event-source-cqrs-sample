@@ -1,6 +1,5 @@
 package io.pillopl.eventsource.domain.shopitem.events;
 
-import io.pillopl.eventsource.domain.DomainEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

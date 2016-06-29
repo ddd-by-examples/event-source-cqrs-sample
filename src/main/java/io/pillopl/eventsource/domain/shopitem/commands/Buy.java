@@ -1,6 +1,5 @@
 package io.pillopl.eventsource.domain.shopitem.commands;
 
-import io.pillopl.eventsource.domain.Command;
 import lombok.Value;
 
 import java.math.BigDecimal;
