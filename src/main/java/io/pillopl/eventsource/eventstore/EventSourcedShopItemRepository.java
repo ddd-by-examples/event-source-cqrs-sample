@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,12 +43,24 @@ public class EventSourcedShopItemRepository implements ShopItemRepository {
 
     @Override
     public ShopItem getByUUID(UUID uuid) {
-        List<DomainEvent> domainEvents =
-                eventStore.getEventsForAggregate(uuid)
+        return ShopItem.from(uuid, getRelatedEvents(uuid));
+    }
+
+    @Override
+    public ShopItem getByUUIDat(UUID uuid, Instant at) {
+        return ShopItem.from(uuid,
+                getRelatedEvents(uuid)
                         .stream()
-                        .map(eventSerializer::deserialize)
-                        .collect(toList());
-        return ShopItem.from(uuid, domainEvents);
+                        .filter(evt -> !evt.when().isAfter(at))
+                        .collect(toList()));
+    }
+
+
+    private List<DomainEvent> getRelatedEvents(UUID uuid) {
+        return eventStore.getEventsForAggregate(uuid)
+                .stream()
+                .map(eventSerializer::deserialize)
+                .collect(toList());
     }
 
 }
