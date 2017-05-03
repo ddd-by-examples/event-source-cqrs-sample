@@ -1,3 +1,6 @@
+[![Conference recommends](https://devternity.com/shields/recommends.svg)](https://devternity.com)
+
+
 # Sample event sourced application with Command Query Responsibility Segregation
 
 ** Event sourcing **
