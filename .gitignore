@@ -12,4 +12,5 @@ logs
 .log
 .zip
 /out
+/log
 *~

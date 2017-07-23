@@ -3,42 +3,34 @@ package io.pillopl.eventsource.eventstore;
 
 import io.pillopl.eventsource.domain.shopitem.ShopItem;
 import io.pillopl.eventsource.domain.shopitem.ShopItemRepository;
-import io.pillopl.eventsource.domain.shopitem.events.DomainEvent;
+import org.javers.core.Javers;
+import org.javers.core.diff.Change;
+import org.javers.repository.jql.QueryBuilder;
+import org.javers.spring.annotation.JaversAuditable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.toList;
 
 @Component
 public class EventSourcedShopItemRepository implements ShopItemRepository {
 
-    private final EventStore eventStore;
-    private final EventSerializer eventSerializer;
-    private final ApplicationEventPublisher eventPublisher;
+    private final Javers javers;
 
     @Autowired
-    public EventSourcedShopItemRepository(EventStore eventStore, EventSerializer eventSerializer, ApplicationEventPublisher eventPublisher) {
-        this.eventStore = eventStore;
-        this.eventSerializer = eventSerializer;
-        this.eventPublisher = eventPublisher;
+    public EventSourcedShopItemRepository(Javers javers) {
+        this.javers = javers;
     }
 
+    @JaversAuditable
     @Override
     public ShopItem save(ShopItem aggregate) {
-        final List<DomainEvent> pendingEvents = aggregate.getUncommittedChanges();
-        eventStore.saveEvents(
-                aggregate.getUuid(),
-                pendingEvents
-                        .stream()
-                        .map(eventSerializer::serialize)
-                        .collect(toList()));
-        pendingEvents.forEach(eventPublisher::publishEvent);
-        return aggregate.markChangesAsCommitted();
+        return aggregate;
     }
 
     @Override
@@ -48,19 +40,28 @@ public class EventSourcedShopItemRepository implements ShopItemRepository {
 
     @Override
     public ShopItem getByUUIDat(UUID uuid, Instant at) {
-        return ShopItem.from(uuid,
-                getRelatedEvents(uuid)
-                        .stream()
-                        .filter(evt -> !evt.when().isAfter(at))
-                        .collect(toList()));
+        return ShopItem.from(uuid, getRelatedEvents(uuid, at));
     }
 
-
-    private List<DomainEvent> getRelatedEvents(UUID uuid) {
-        return eventStore.getEventsForAggregate(uuid)
-                .stream()
-                .map(eventSerializer::deserialize)
-                .collect(toList());
+    private List<Change> getRelatedEvents(UUID uuid, Instant at) {
+        return reverse(
+                javers.findChanges(QueryBuilder.byInstanceId(uuid, ShopItem.class)
+                        .to(LocalDateTime.ofInstant(at, ZoneId.systemDefault()))
+                        .build()
+                )
+        );
     }
 
+    private List<Change> getRelatedEvents(UUID uuid) {
+        return reverse(
+                javers.findChanges(QueryBuilder.byInstanceId(uuid, ShopItem.class)
+                        .build()
+                )
+        );
+    }
+
+    private List<Change> reverse(List<Change> changes) {
+        Collections.reverse(changes);
+        return changes;
+    }
 }

@@ -43,6 +43,8 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.4'
     compile "org.liquibase:liquibase-core:$liquibaseVersion"
 
+    compile "org.javers:javers-spring-boot-starter-sql:3.3.5"
+
     runtime 'cglib:cglib-nodep:3.2.1'
     runtime 'com.h2database:h2'
 

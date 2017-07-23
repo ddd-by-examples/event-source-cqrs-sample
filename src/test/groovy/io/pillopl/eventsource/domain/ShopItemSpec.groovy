@@ -18,7 +18,7 @@ class ShopItemSpec extends Specification {
 
     def 'should emit item bought event when buying initialized item'() {
         when:
-            ShopItem tx = initialized().buy(uuid, now(), PAYMENT_DEADLINE_IN_HOURS)
+            ShopItem tx = initialized(uuid).buy(uuid, now(), PAYMENT_DEADLINE_IN_HOURS)
         then:
             tx.getUncommittedChanges().size() == 1
             tx.getUncommittedChanges().head().type() == ItemBought.TYPE
@@ -26,7 +26,7 @@ class ShopItemSpec extends Specification {
 
     def 'should calculate #deadline when buying at #buyingAt and expiration in hours #expiresIn'() {
         when:
-            ShopItem tx = initialized().buy(uuid, parse(buyingAt), expiresIn)
+            ShopItem tx = initialized(uuid).buy(uuid, parse(buyingAt), expiresIn)
         then:
             ((ItemBought) tx.getUncommittedChanges().head()).paymentTimeoutDate == parse(deadline)
         where:
@@ -41,7 +41,7 @@ class ShopItemSpec extends Specification {
 
     def 'Payment expiration date cannot be in the past'() {
         given:
-            ShopItem tx = initialized()
+            ShopItem tx = initialized(uuid)
         when:
             tx.buy(uuid, now(), -1)
         then:
@@ -60,25 +60,25 @@ class ShopItemSpec extends Specification {
 
     def 'cannot pay for just initialized item'() {
         given:
-            ShopItem tx = initialized()
+            ShopItem tx = initialized(uuid)
         when:
-            tx.pay(now())
+            tx.pay()
         then:
             thrown(IllegalStateException)
     }
 
     def 'cannot mark payment timeout when item just initialized'() {
         given:
-            ShopItem tx = initialized()
+            ShopItem tx = initialized(uuid)
         when:
-            tx.markTimeout(now())
+            tx.markTimeout()
         then:
             thrown(IllegalStateException)
     }
 
     def 'should emit item paid event when paying for bought item'() {
         when:
-            ShopItem tx = bought(uuid).pay(now())
+            ShopItem tx = bought(uuid).pay()
         then:
             tx.getUncommittedChanges().size() == 1
             tx.getUncommittedChanges().head().type() == ItemPaid.TYPE
@@ -88,14 +88,14 @@ class ShopItemSpec extends Specification {
         given:
             ShopItem tx = paid(uuid)
         when:
-            tx.pay(now())
+            tx.pay()
         then:
             tx.getUncommittedChanges().isEmpty()
     }
 
     def 'should emit payment timeout event when marking item as payment missing'() {
         when:
-            ShopItem tx = bought(uuid).markTimeout(now())
+            ShopItem tx = bought(uuid).markTimeout()
         then:
             tx.getUncommittedChanges().size() == 1
             tx.getUncommittedChanges().head().type() == ItemPaymentTimeout.TYPE
@@ -103,21 +103,21 @@ class ShopItemSpec extends Specification {
 
     def 'marking payment timeout should be idempotent'() {
         when:
-            ShopItem tx = withTimeout(uuid).markTimeout(now())
+            ShopItem tx = withTimeout(uuid).markTimeout()
         then:
             tx.getUncommittedChanges().isEmpty()
     }
 
     def 'cannot mark payment missing when item already paid'() {
         when:
-            paid(uuid).markTimeout(now())
+            paid(uuid).markTimeout()
         then:
             thrown(IllegalStateException)
     }
 
     def 'should emit item paid event when receiving missed payment'() {
         when:
-            ShopItem tx = withTimeout(uuid).pay(now())
+            ShopItem tx = withTimeout(uuid).pay()
         then:
             tx.getUncommittedChanges().size() == 1
             tx.getUncommittedChanges().head().type() == ItemPaid.TYPE
@@ -126,7 +126,7 @@ class ShopItemSpec extends Specification {
 
     def 'receiving payment after timeout should be idempotent'() {
         when:
-            ShopItem tx = withTimeoutAndPaid(uuid).pay(now())
+            ShopItem tx = withTimeoutAndPaid(uuid).pay()
         then:
             tx.getUncommittedChanges().isEmpty()
     }

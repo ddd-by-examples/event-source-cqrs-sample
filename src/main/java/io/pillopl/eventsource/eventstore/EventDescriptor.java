@@ -19,16 +19,11 @@ class EventDescriptor {
     private String body;
 
     @Getter
-    @Column(nullable = false, name = "occurred_at")
-    private Instant occurredAt = Instant.now();
-
-    @Getter
     @Column(nullable = false, length = 60)
     private String type;
 
-    EventDescriptor(String body, Instant occurredAt, String type) {
+    EventDescriptor(String body, String type) {
         this.body = body;
-        this.occurredAt = occurredAt;
         this.type = type;
     }
 
