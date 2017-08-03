@@ -2,7 +2,6 @@ package io.pillopl.eventsource.integration.boundary
 
 import io.pillopl.eventsource.boundary.ShopItems
 import io.pillopl.eventsource.domain.shopitem.ShopItem
-import io.pillopl.eventsource.eventstore.EventStore
 import io.pillopl.eventsource.integration.IntegrationSpec
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Subject
@@ -17,9 +16,6 @@ class ShopItemsIntegrationSpec extends IntegrationSpec {
     @Subject
     @Autowired
     ShopItems shopItems
-
-    @Autowired
-    EventStore eventStore
 
     def 'item should wait for payment when create bought item command comes and no item yet'() {
         when:

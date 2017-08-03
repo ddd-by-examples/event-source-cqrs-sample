@@ -4,6 +4,7 @@ import io.pillopl.eventsource.boundary.ShopItems
 import io.pillopl.eventsource.integration.IntegrationSpec
 import io.pillopl.eventsource.readmodel.JdbcReadModel
 import io.pillopl.eventsource.readmodel.PaymentTimeoutChecker
+import org.junit.Ignore
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Subject
 
@@ -12,6 +13,7 @@ import static io.pillopl.eventsource.CommandFixture.payItemCommand
 import static java.time.Instant.now
 import static java.time.temporal.ChronoUnit.HOURS
 
+@Ignore
 class PaymentTimeoutCheckerIntegrationSpec extends IntegrationSpec {
 
     private static final UUID WILL_TIMEOUT = UUID.randomUUID()

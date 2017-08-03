@@ -1,37 +1,37 @@
 package io.pillopl.eventsource.integration.eventstore
 
 import io.pillopl.eventsource.domain.shopitem.ShopItem
+import io.pillopl.eventsource.domain.shopitem.ShopItemState
 import io.pillopl.eventsource.eventstore.EventSourcedShopItemRepository
 import io.pillopl.eventsource.integration.IntegrationSpec
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Subject
 
-import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 import static io.pillopl.eventsource.ShopItemFixture.initialized
 import static io.pillopl.eventsource.domain.shopitem.ShopItemState.BOUGHT
 import static io.pillopl.eventsource.domain.shopitem.ShopItemState.PAID
-import static java.time.LocalDate.now
-import static java.time.ZoneId.systemDefault
-import static java.time.temporal.ChronoUnit.DAYS
+import static io.pillopl.eventsource.integration.MockClock.*
 
 class EventSourcedShopItemRepositoryIntegrationSpec extends IntegrationSpec {
 
     private static final UUID uuid = UUID.randomUUID()
     private static final int PAYMENT_DEADLINE_IN_HOURS = 48
-    private static final Instant TODAY = now().atStartOfDay(systemDefault()).toInstant()
-    private static final Instant TOMORROW = TODAY.plus(1, DAYS)
-    private static final Instant DAY_AFTER_TOMORROW =  TOMORROW.plus(1, DAYS)
-
 
     @Subject
     @Autowired
     EventSourcedShopItemRepository shopItemRepository
 
+
     def 'should store and load item'() {
         given:
-            ShopItem stored = initialized().buy(uuid, TODAY, PAYMENT_DEADLINE_IN_HOURS)
+            ShopItem stored = initialized(uuid)
         when:
+            stored = shopItemRepository.save(stored)
+        and:
+            stored = stored.buy(uuid, TODAY, PAYMENT_DEADLINE_IN_HOURS)
             shopItemRepository.save(stored)
         and:
             ShopItem loaded = shopItemRepository.getByUUID(uuid)
@@ -42,9 +42,17 @@ class EventSourcedShopItemRepositoryIntegrationSpec extends IntegrationSpec {
 
     def 'should reconstruct item at given moment'() {
         given:
-            ShopItem stored = initialized()
-                    .buy(uuid, TOMORROW, PAYMENT_DEADLINE_IN_HOURS)
-                    .pay(DAY_AFTER_TOMORROW)
+            mockClock.clear()
+            mockClock.mock(TODAY)
+            mockClock.mock(TOMORROW)
+            mockClock.mock(DAY_AFTER_TOMORROW)
+
+            ShopItem stored = new ShopItem(uuid, Collections.EMPTY_LIST, ShopItemState.INITIALIZED)
+            stored = shopItemRepository.save(stored)
+            stored = stored.buy(uuid, TOMORROW, PAYMENT_DEADLINE_IN_HOURS)
+            stored = shopItemRepository.save(stored)
+            stored = stored.pay()
+
         when:
             shopItemRepository.save(stored)
         and:
@@ -54,7 +62,6 @@ class EventSourcedShopItemRepositoryIntegrationSpec extends IntegrationSpec {
         then:
             bought.state == BOUGHT
             paid.state == PAID
-
     }
 
 }

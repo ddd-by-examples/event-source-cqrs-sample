@@ -1,12 +1,15 @@
 package io.pillopl.eventsource.domain.shopitem;
 
 import com.google.common.collect.ImmutableList;
+import io.pillopl.eventsource.domain.shopitem.accumulators.ShopItemAccumulators;
 import io.pillopl.eventsource.domain.shopitem.events.DomainEvent;
 import io.pillopl.eventsource.domain.shopitem.events.ItemBought;
 import io.pillopl.eventsource.domain.shopitem.events.ItemPaid;
 import io.pillopl.eventsource.domain.shopitem.events.ItemPaymentTimeout;
-import lombok.Getter;
 import lombok.Value;
+import org.javers.core.diff.Change;
+import org.javers.core.metamodel.annotation.DiffIgnore;
+import org.javers.core.metamodel.annotation.Id;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -18,14 +21,15 @@ import static io.pillopl.eventsource.domain.shopitem.ShopItemState.*;
 @Value
 public class ShopItem {
 
-    @Getter
+    @Id
     private final UUID uuid;
-    private final ImmutableList<DomainEvent> changes;
+    @DiffIgnore
+    private final List<DomainEvent> changes;
     private final ShopItemState state;
 
     public ShopItem buy(UUID uuid, Instant when, int hoursToPaymentTimeout) {
         if (state == INITIALIZED) {
-            return applyChange(new ItemBought(uuid, when, calculatePaymentTimeoutDate(when, hoursToPaymentTimeout)));
+            return applyChange(new ItemBought(uuid, calculatePaymentTimeoutDate(when, hoursToPaymentTimeout)));
         } else {
             return this;
         }
@@ -39,20 +43,20 @@ public class ShopItem {
         return paymentTimeout;
     }
 
-    public ShopItem pay(Instant when) {
+    public ShopItem pay() {
         throwIfStateIs(INITIALIZED, "Cannot pay for not existing item");
         if (state != PAID) {
-            return applyChange(new ItemPaid(uuid, when));
+            return applyChange(new ItemPaid(uuid));
         } else {
             return this;
         }
     }
 
-    public ShopItem markTimeout(Instant when) {
+    public ShopItem markTimeout() {
         throwIfStateIs(INITIALIZED, "Payment is not missing yet");
         throwIfStateIs(PAID, "Item already paid");
         if (state == BOUGHT) {
-            return applyChange(new ItemPaymentTimeout(uuid, when));
+            return applyChange(new ItemPaymentTimeout(uuid));
         } else {
             return this;
         }
@@ -76,12 +80,12 @@ public class ShopItem {
         return new ShopItem(event.getUuid(), changes, PAYMENT_MISSING);
     }
 
-    public static ShopItem from(UUID uuid, List<DomainEvent> history) {
+    public static ShopItem from(UUID uuid, List<Change> history) {
         return history
                 .stream()
                 .reduce(
                         new ShopItem(uuid, ImmutableList.of(), INITIALIZED),
-                        (tx, event) -> tx.applyChange(event, false),
+                        (tx, event) -> ShopItemAccumulators.reduce(tx, event),
                         (t1, t2) -> {throw new UnsupportedOperationException();}
                 );
     }
@@ -119,7 +123,7 @@ public class ShopItem {
         return applyChange(event, true);
     }
 
-    public ImmutableList<DomainEvent> getUncommittedChanges() {
+    public List<DomainEvent> getUncommittedChanges() {
         return changes;
     }
 

@@ -14,11 +14,11 @@ import static java.time.Instant.now;
 public class CommandFixture {
 
     public static Buy buyItemCommand(UUID uuid) {
-        return new Buy(uuid, ZERO, now());
+        return new Buy(uuid, ZERO);
     }
 
     public static Buy buyItemCommand(UUID uuid, Instant when) {
-        return new Buy(uuid, ZERO, when);
+        return new Buy(uuid, ZERO);
     }
 
     public static Pay payItemCommand(UUID uuid) {

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -15,16 +14,10 @@ public class ItemPaid implements DomainEvent {
     public static final String TYPE = "item.paid";
 
     private UUID uuid;
-    private Instant when;
 
     @Override
     public String type() {
         return TYPE;
-    }
-
-    @Override
-    public Instant when() {
-        return when;
     }
 
     @Override

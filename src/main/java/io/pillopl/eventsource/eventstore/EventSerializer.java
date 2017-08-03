@@ -25,7 +25,7 @@ class EventSerializer {
 
     EventDescriptor serialize(DomainEvent event) {
         try {
-            return new EventDescriptor(objectMapper.writeValueAsString(event), event.when(), event.type());
+            return new EventDescriptor(objectMapper.writeValueAsString(event), event.type());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

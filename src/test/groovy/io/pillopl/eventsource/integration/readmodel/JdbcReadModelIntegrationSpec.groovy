@@ -4,6 +4,7 @@ import io.pillopl.eventsource.boundary.ShopItems
 import io.pillopl.eventsource.integration.IntegrationSpec
 import io.pillopl.eventsource.readmodel.JdbcReadModel
 import io.pillopl.eventsource.readmodel.ShopItemDto
+import org.junit.Ignore
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Subject
 
@@ -12,6 +13,7 @@ import java.time.Instant
 import static io.pillopl.eventsource.CommandFixture.*
 import static java.time.Instant.parse
 
+@Ignore
 class JdbcReadModelIntegrationSpec extends IntegrationSpec {
 
     private static final Instant ANY_TIME = parse("1995-10-23T10:12:35Z")

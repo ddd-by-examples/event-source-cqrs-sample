@@ -3,7 +3,6 @@ package io.pillopl.eventsource.domain.shopitem.events;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @JsonTypeInfo(
@@ -18,7 +17,6 @@ import java.util.UUID;
 public interface DomainEvent {
 
     String type();
-    Instant when();
     UUID uuid();
 }
 

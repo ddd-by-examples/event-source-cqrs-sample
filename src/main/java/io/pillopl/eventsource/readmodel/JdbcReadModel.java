@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.UUID;
 
-import static java.sql.Timestamp.from;
-
 @Component
 class JdbcReadModel {
 
@@ -37,19 +35,19 @@ class JdbcReadModel {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    void updateOrCreateItemAsBlocked(UUID uuid, Instant when, Instant paymentTimeoutDate) {
-        final int affectedRows = jdbcTemplate.update(UPDATE_BOUGHT_ITEM_SQL, from(paymentTimeoutDate), uuid);
+    void updateOrCreateItemAsBlocked(UUID uuid, Instant paymentTimeoutDate) {
+        final int affectedRows = jdbcTemplate.update(UPDATE_BOUGHT_ITEM_SQL, paymentTimeoutDate, uuid);
         if (affectedRows == 0) {
-            jdbcTemplate.update(INSERT_BOUGHT_ITEM_SQL, uuid, from(when), from(paymentTimeoutDate));
+            jdbcTemplate.update(INSERT_BOUGHT_ITEM_SQL, uuid, paymentTimeoutDate);
         }
     }
 
-    void updateItemAsPaid(UUID uuid, Instant when) {
-        jdbcTemplate.update(UPDATE_PAID_ITEM_SQL, from(when), uuid);
+    void updateItemAsPaid(UUID uuid) {
+        jdbcTemplate.update(UPDATE_PAID_ITEM_SQL, uuid);
     }
 
-    void updateItemAsPaymentMissing(UUID uuid, Instant when) {
-        jdbcTemplate.update(UPDATE_PAYMENT_MISSING_SQL, from(when), uuid);
+    void updateItemAsPaymentMissing(UUID uuid) {
+        jdbcTemplate.update(UPDATE_PAYMENT_MISSING_SQL, uuid);
     }
 
     ShopItemDto getItemBy(UUID uuid) {
