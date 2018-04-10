@@ -45,6 +45,7 @@ dependencies {
 
     runtime 'cglib:cglib-nodep:3.2.1'
     runtime 'com.h2database:h2'
+    runtime 'org.codehaus.groovy:groovy:2.4.15'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.spockframework:spock-spring'
